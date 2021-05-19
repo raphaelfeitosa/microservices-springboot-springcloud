@@ -1,15 +1,32 @@
 package com.raphaelfeitosa.hrpayroll.services;
 
-import com.raphaelfeitosa.hrpayroll.entities.Payment;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.raphaelfeitosa.hrpayroll.entities.Payment;
+import com.raphaelfeitosa.hrpayroll.entities.Worker;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PaymentService {
 
+    @Value("${hr-worker.host}")
+    private String workerHost;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
     public Payment getPayment(long workerId, int days) {
 
-        return new Payment("Bod", 200.00, days);
+        Map<String, String> uriVariables = new HashMap<>();
+        uriVariables.put("id", "" + workerId);
+
+        Worker worker = restTemplate.getForObject(workerHost + "/workers/{id}", Worker.class, uriVariables);
+        return new Payment(worker.getName(), worker.getDailyIncome(), days);
     }
 
 }
