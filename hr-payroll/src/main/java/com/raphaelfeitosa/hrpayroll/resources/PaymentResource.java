@@ -1,5 +1,6 @@
 package com.raphaelfeitosa.hrpayroll.resources;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.raphaelfeitosa.hrpayroll.entities.Payment;
 import com.raphaelfeitosa.hrpayroll.services.PaymentService;
 
@@ -17,6 +18,7 @@ public class PaymentResource {
     @Autowired
     private PaymentService paymentService;
 
+    @HystrixCommand(fallbackMethod = "getPaymentAlternative")
     @GetMapping(value = "/{workerId}/days/{days}")
     public ResponseEntity<Payment> getPayment(@PathVariable Long workerId, @PathVariable Integer days) {
 
@@ -24,4 +26,11 @@ public class PaymentResource {
         return ResponseEntity.ok(payment);
 
     }
+
+    public ResponseEntity<Payment> getPaymentAlternative(Long workerId, Integer days) {
+    
+        Payment payment = new Payment("Bran", 400.0, days);
+        return ResponseEntity.ok(payment);
+    }
+
 }
